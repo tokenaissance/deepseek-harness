@@ -173,8 +173,9 @@ export function createElectronBuilderConfig(
       identity: unsigned ? '-' : macOSSigning?.signingIdentity,
       forceCodeSigning: !unsigned,
       hardenedRuntime: true,
-      entitlements: fileURLToPath(new URL('./macos-entitlements.plist', import.meta.url)),
-      entitlementsInherit: fileURLToPath(new URL('./macos-entitlements.plist', import.meta.url)),
+      // Ad-hoc builds cannot carry keychain-access-groups: macOS refuses to launch them.
+      entitlements: fileURLToPath(new URL(unsigned ? './macos-entitlements.plist' : './macos-signed-entitlements.plist', import.meta.url)),
+      entitlementsInherit: fileURLToPath(new URL(unsigned ? './macos-entitlements.plist' : './macos-signed-entitlements.plist', import.meta.url)),
       // Prepared runtime files retain their signatures; PAK resources are sealed by their enclosing bundle.
       signIgnore: ['/Contents/Resources/app\\.asar\\.unpacked/dsh(?:/|$)', '/Contents/Resources/runtime/primary-runtime(?:/|$)', '\\.pak$'],
       notarize: !unsigned && !skipNotarization,
